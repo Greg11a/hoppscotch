@@ -119,6 +119,13 @@
           </tippy>
 
           <HoppButtonSecondary
+            v-tippy="{ theme: 'tooltip' }"
+            :title="isDarkMode ? t('settings.light_mode') : t('settings.dark_mode')"
+            :icon="isDarkMode ? IconSun : IconMoon"
+            class="rounded hover:bg-primaryDark focus-visible:bg-primaryDark"
+            @click="toggleColorMode"
+          />
+          <HoppButtonSecondary
             v-tippy="{ theme: 'tooltip', allowHTML: true }"
             :title="`${
               mdAndLarger ? t('support.title') : t('app.options')
@@ -368,6 +375,7 @@ import { getKernelMode } from "@hoppscotch/kernel"
 
 import { useI18n } from "@composables/i18n"
 import { useReadonlyStream } from "@composables/stream"
+import { useColorMode } from "@composables/theming"
 import { defineActionHandler, invokeAction } from "@helpers/actions"
 import { breakpointsTailwind, useBreakpoints, useNetwork } from "@vueuse/core"
 import { useService } from "dioc/vue"
@@ -379,6 +387,7 @@ import { computed, onMounted, reactive, ref, watch } from "vue"
 import { useToast } from "~/composables/toast"
 import { GetMyTeamsQuery, TeamAccessRole } from "~/helpers/backend/graphql"
 import { deleteTeam as backendDeleteTeam } from "~/helpers/backend/mutations/Team"
+import { applySetting } from "~/newstore/settings"
 import { platform } from "~/platform"
 import { AdditionalLinksService } from "~/services/additionalLinks.service"
 import {
@@ -391,6 +400,8 @@ import IconChevronDown from "~icons/lucide/chevron-down"
 import IconDownload from "~icons/lucide/download"
 import IconLayoutDashboard from "~icons/lucide/layout-dashboard"
 import IconLifeBuoy from "~icons/lucide/life-buoy"
+import IconMoon from "~icons/lucide/moon"
+import IconSun from "~icons/lucide/sun"
 import IconSettings from "~icons/lucide/settings"
 import IconUploadCloud from "~icons/lucide/upload-cloud"
 import IconUser from "~icons/lucide/user"
@@ -400,6 +411,14 @@ import IconUsers from "~icons/lucide/users"
 const t = useI18n()
 const toast = useToast()
 const kernelMode = getKernelMode()
+
+const colorMode = useColorMode()
+const isDarkMode = computed(
+  () => colorMode.value === "dark" || colorMode.value === "black"
+)
+const toggleColorMode = () => {
+  applySetting("BG_COLOR", isDarkMode.value ? "light" : "dark")
+}
 
 const headerRef = ref<HTMLElement | null>(null)
 const downloadableLinksRef =

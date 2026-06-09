@@ -111,11 +111,11 @@ export default defineConfig({
       importMode: "async",
       onRoutesGenerated(routes) {
         generateSitemap({
-          routes,
+          routes: routes.filter((r) => r.path !== undefined),
           nuxtStyle: true,
           allowRobots: true,
           dest: ".sitemap-gen",
-          hostname: ENV.VITE_BASE_URL,
+          hostname: ENV.VITE_BASE_URL ?? "http://localhost:3000",
         })
       },
     }),
